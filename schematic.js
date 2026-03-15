@@ -305,6 +305,12 @@ function init() {
   renderPoster();
   renderSpec();
   fitZoom();
+  // Live-update title bar on the drawing whenever a title block field changes
+  ['tb-shop','tb-build','tb-builder','tb-date','tb-rev','tb-mat','tb-finish','tb-notes']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', renderPoster);
+    });
 }
 
 // ── SHEET SWITCHING ───────────────────────────────────────────────
