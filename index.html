@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bicycle Technical Schematic — Utility Diamond Frame</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+  :root {
+    --ink:#1a1a18; --ink-2:#3d3d38; --ink-3:#6b6b64; --ink-4:#9b9b92;
+    --rule:#c8c8be; --rule-light:#e8e8e0; --bg:#fafaf6; --bg-2:#f2f2ec; --bg-3:#e4e4dc;
+    --red:#b83232; --green:#2a7a42; --amber:#8a5e0a;
+    --mono:'IBM Plex Mono','Courier New',monospace; --sans:'IBM Plex Sans',sans-serif;
+    --pw:272px; --sw:288px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg-2);color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+  #topbar{height:46px;background:var(--ink);color:var(--bg);display:flex;align-items:center;padding:0 12px;gap:7px;flex-shrink:0;font-family:var(--mono);font-size:10px;letter-spacing:.08em;user-select:none}
+  .tb-logo{font-weight:600;font-size:11px;color:#fff;letter-spacing:.12em;white-space:nowrap}
+  .tb-sep{color:#444}
+  .tb-sub{color:#777;white-space:nowrap}
+  .tb-spacer{flex:1}
+
+  #sheetbar{height:32px;background:#1e1e1c;border-bottom:1px solid #3a3a38;display:flex;align-items:stretch;padding:0 12px;gap:0;flex-shrink:0}
+  .sheet-tab{padding:0 18px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#777;cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;white-space:nowrap}
+  .sheet-tab:hover{color:#ccc;background:#252523}
+  .sheet-tab.active{color:#fff;background:#252523;border-bottom-color:#fff}
+
+  .zoom-group,.lang-group{display:flex;border:1px solid #3a3a38;border-radius:3px;overflow:hidden}
+  .zoom-btn,.lang-btn{background:transparent;border:none;padding:4px 9px;cursor:pointer;border-right:1px solid #3a3a38;transition:all .1s}
+  .zoom-btn:last-child,.lang-btn:last-child{border-right:none}
+  .zoom-btn{color:#888;font-family:var(--mono);font-size:10px}
+  .lang-btn{font-size:14px;line-height:1;padding:4px 7px}
+  .zoom-btn:hover,.lang-btn:hover{background:#252523}
+  .zoom-btn.active,.lang-btn.active{background:#333;color:#fff}
+
+  .tb-btn{background:transparent;border:1px solid #3a3a38;color:#888;padding:4px 11px;font-family:var(--mono);font-size:10px;letter-spacing:.07em;cursor:pointer;border-radius:3px;transition:all .12s;white-space:nowrap}
+  .tb-btn:hover{border-color:#777;color:#fff}
+  .tb-btn.primary{border-color:#666;color:#ddd;background:#252523}
+  .tb-btn.primary:hover{background:#333;color:#fff}
+
+  #workspace{flex:1;display:flex;overflow:hidden}
+
+  .panel-hdr{padding:9px 13px 7px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;background:var(--bg-2);flex-shrink:0}
+
+  #canvas-area{flex:1;overflow:hidden;position:relative;background:linear-gradient(var(--rule-light) 1px,transparent 1px),linear-gradient(90deg,var(--rule-light) 1px,transparent 1px),var(--bg-3);background-size:24px 24px}
+  #canvas-scroll{width:100%;height:100%;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px}
+  #poster-wrap{transform-origin:top center;transition:transform .18s ease;flex-shrink:0}
+  #poster-canvas{background:white;box-shadow:0 3px 24px rgba(0,0,0,.14),0 0 0 1px var(--rule);display:block}
+  #panel-right{width:var(--sw);background:var(--bg);border-left:1px solid var(--rule);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .2s}
+  #panel-right.hidden{width:0;overflow:hidden}
+  #right-scroll{flex:1;overflow-y:auto}
+  .ssec{border-bottom:1px solid var(--rule)}
+  .ssec-hdr{padding:8px 13px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;background:var(--bg-2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+  .ssec-hdr:hover{background:var(--bg-3)}
+  .ssec-body{padding:9px 13px}
+  .ssec.collapsed .ssec-body{display:none}
+  .srow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--rule-light);gap:6px}
+  .srow:last-child{border-bottom:none}
+  .slabel{font-family:var(--mono);font-size:8.5px;color:var(--ink-3);letter-spacing:.07em;text-transform:uppercase;flex-shrink:0}
+  .sval-input{border:none;background:transparent;text-align:right;font-family:var(--mono);font-size:10px;color:var(--ink);font-weight:500;width:100%;outline:none;padding:1px 3px;border-radius:2px}
+  .sval-input:focus{background:var(--bg-2);outline:1px solid var(--rule)}
+  .dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .dok{background:var(--green)}.dwarn{background:var(--amber)}.derr{background:var(--red)}.dempty{background:var(--rule)}
+  .vitem{display:flex;align-items:flex-start;gap:7px;padding:5px 0;font-size:10px;color:var(--ink-2);border-bottom:1px solid var(--rule-light);line-height:1.4}
+  .vitem:last-child{border-bottom:none}
+  .vitem.ok{color:var(--ink-4)}.vitem.err{color:var(--red)}.vitem.warn{color:var(--amber)}
+  .geo-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .gfield label{display:block;font-family:var(--mono);font-size:8px;color:var(--ink-4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+  .gfield input{width:100%;border:1px solid var(--rule);border-radius:2px;padding:4px 6px;font-family:var(--mono);font-size:10px;color:var(--ink);background:white;outline:none}
+  .gfield input:focus{border-color:var(--ink-2)}
+  .gbtn{width:100%;margin-top:7px;padding:6px;border:1px solid var(--rule);border-radius:2px;font-family:var(--mono);font-size:9px;letter-spacing:.09em;cursor:pointer;background:var(--bg-2);color:var(--ink-2);transition:all .12s}
+  .gbtn:hover{border-color:var(--ink-2);color:var(--ink)}
+  .gbtn.apply{background:var(--ink);color:white;border-color:var(--ink);margin-top:9px}
+  .gbtn.apply:hover{background:var(--ink-2)}
+  .tb-select{background:#1a1a18;border:1px solid #3a3a38;color:#ccc;padding:3px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.07em;border-radius:3px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:155px;height:26px}
+  .tb-select:hover{border-color:#777;color:#fff}
+  .tb-select option{background:#1a1a18;color:#ccc}
+
+  #ctx-menu{position:fixed;background:var(--ink);border:1px solid #333;border-radius:3px;padding:4px 0;z-index:1000;display:none;min-width:130px}
+  .cxi{padding:6px 14px;font-family:var(--mono);font-size:10px;color:#ccc;cursor:pointer}
+  .cxi:hover{background:#2a2a28;color:white}
+  .cxi.danger{color:#e05555}
+  .cxi.danger:hover{background:var(--red);color:white}
+  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:white;padding:7px 16px;border-radius:2px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;opacity:0;transition:all .22s;z-index:2000;pointer-events:none}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+
+  /* ── COVERSHEET ──────────────────────────────────────────────────── */
+  #coversheet{position:fixed;inset:0;z-index:9999;background:rgba(10,10,8,.72);backdrop-filter:blur(16px) saturate(.3);-webkit-backdrop-filter:blur(16px) saturate(.3);display:flex;align-items:center;justify-content:center;padding:20px 16px}
+  #cover-card{max-width:580px;width:100%;max-height:calc(100vh - 56px);background:#0f0f0d;border:1px solid #222220;border-radius:2px;box-shadow:0 32px 96px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03);display:flex;flex-direction:column;overflow:hidden}
+  #cover-head{padding:30px 38px 22px;flex-shrink:0;border-bottom:1px solid #1a1a18}
+  #cover-greeting{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.24em;color:#d8d8d0;text-transform:uppercase;margin-bottom:5px}
+  #cover-tagline{font-family:var(--mono);font-size:8.5px;letter-spacing:.13em;color:#3a3a34}
+  #cover-scroll-body{flex:1;overflow-y:auto;padding:22px 38px 12px;min-height:0}
+  #cover-scroll-body::-webkit-scrollbar{width:3px}
+  #cover-scroll-body::-webkit-scrollbar-track{background:transparent}
+  #cover-scroll-body::-webkit-scrollbar-thumb{background:#2a2a28;border-radius:4px}
+  .cv-intro{font-family:var(--mono);font-size:10px;line-height:1.95;color:#585852;margin-bottom:0}
+  .cv-intro strong{color:#888880;font-weight:500}
+  .cv-rule{border:none;border-top:1px solid #181816;margin:18px 0}
+  .cv-head{font-family:var(--mono);font-size:7.5px;letter-spacing:.22em;color:#484840;text-transform:uppercase;margin-bottom:7px;font-weight:600}
+  .cv-body{font-family:var(--mono);font-size:10px;line-height:1.9;color:#525250;margin-bottom:0}
+  .cv-body strong{color:#909088;font-weight:500}
+  .cv-list{list-style:none;margin:8px 0 0 0;padding:0}
+  .cv-list li{padding-left:16px;position:relative;margin-bottom:3px;font-family:var(--mono);font-size:10px;color:#484840;line-height:1.75}
+  .cv-list li::before{content:'—';position:absolute;left:0;color:#2c2c2a}
+  .cv-alpha{display:block;margin-top:10px;line-height:2.1;color:#484840;font-family:var(--mono);font-size:10px}
+  .cv-warn{background:#0d0906;border:1px solid #2a1a12;border-radius:2px;padding:14px 18px;margin:6px 0}
+  .cv-warn-skull{display:inline;font-style:normal;margin-right:6px;opacity:.55}
+  .cv-warn .cv-body{color:#604838}
+  .cv-warn .cv-body strong{color:#906858}
+  #cover-foot{flex-shrink:0;padding:14px 38px 26px;border-top:1px solid #181816}
+  #cover-scroll-hint{text-align:center;font-family:var(--mono);font-size:8px;letter-spacing:.13em;color:#2a2a26;margin-bottom:9px;transition:opacity .4s}
+  #cover-scroll-hint.gone{opacity:0;pointer-events:none}
+  #cover-accept{display:block;width:100%;padding:12px 0;background:transparent;border:1px solid #242420;color:#30302c;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;cursor:not-allowed;transition:all .3s;border-radius:2px;outline:none}
+  #cover-accept.ready{border-color:#5a3020;color:#a05838;cursor:pointer}
+  #cover-accept.ready:hover{background:#4a2016;color:#d87848;box-shadow:0 0 48px rgba(74,32,22,.3);border-color:#6a3820}
+  #cover-legal{text-align:center;font-family:var(--mono);font-size:7px;letter-spacing:.08em;color:#b8940a;margin-top:10px;line-height:1.9}
+  #cover-lang{display:flex;gap:1px;flex-shrink:0;margin-top:2px}
+  .cv-lang-btn{background:transparent;border:none;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:#242420;cursor:pointer;padding:2px 5px;border-radius:2px;transition:color .15s;line-height:1}
+  .cv-lang-btn:hover{color:#555550}
+  .cv-lang-btn.cv-lang-active{color:#888880}
+</style>
+</head>
+<body>
+
+<div id="coversheet" role="dialog" aria-modal="true" aria-labelledby="cover-greeting">
+  <div id="cover-card">
+
+    <div id="cover-head">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div id="cover-greeting" data-cv="greeting">Bicycle Technical Schematic</div>
+          <div id="cover-tagline" data-cv="tagline">A personal project &middot; shared freely &middot; please read before continuing</div>
+        </div>
+        <div id="cover-lang" role="group" aria-label="Language">
+          <button class="cv-lang-btn cv-lang-active" data-cvl="en" onclick="setCoverLang('en')">EN</button>
+          <button class="cv-lang-btn" data-cvl="fr" onclick="setCoverLang('fr')">FR</button>
+          <button class="cv-lang-btn" data-cvl="es" onclick="setCoverLang('es')">ES</button>
+          <button class="cv-lang-btn" data-cvl="ru" onclick="setCoverLang('ru')">RU</button>
+          <button class="cv-lang-btn" data-cvl="zh" onclick="setCoverLang('zh')">ZH</button>
+          <button class="cv-lang-btn" data-cvl="fa" onclick="setCoverLang('fa')">FA</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cover-scroll-body">
+      <div style="height:18px"></div>
+
+      <div class="cv-intro" data-cv="intro">This tool generates bicycle geometry diagrams, bills of material, and fabrication briefs. It was built by one person, for personal use, and is offered here freely to anyone curious about how bicycles are designed and made.<br><br>
+      Before you use it, it needs to be honest with you about <strong>what it is — and what it is not.</strong></div>
+
+      <hr class="cv-rule">
+      <div class="cv-head" data-cv="h1">&sect;&thinsp;1 &mdash; This is not professional engineering documentation</div>
+      <div class="cv-body" data-cv="b1">The creator of this tool is <strong>not a licensed mechanical engineer, structural engineer, or credentialed professional of any kind.</strong> All geometry, dimensions, material callouts, tolerances, and specifications produced here are the work of a private individual learning in public. They have not been independently reviewed, stress-analysed, prototyped, or validated. They may contain errors, unsafe assumptions, and significant omissions. Nothing here constitutes professional engineering advice or a production-ready design.</div>
+
+      <hr class="cv-rule">
+      <div class="cv-head" data-cv="h2">&sect;&thinsp;2 &mdash; This is a work in progress</div>
+      <div class="cv-body" data-cv="b2">The content is <strong>incomplete and subject to change without notice.</strong> Tube wall thicknesses, weld details, bearing fits, thread standards, load estimates, and safety factors shown here have not reached a state of completeness. Do not treat any output as finished. Do not fabricate directly from it without independent verification by a qualified person.</div>
+
+      <hr class="cv-rule">
+      <div class="cv-head" data-cv="h3">&sect;&thinsp;3 &mdash; Permitted and prohibited use</div>
+      <div class="cv-body" data-cv="b3">This tool is for <strong>personal, non-commercial, educational, and individual hobbyist use only.</strong> The following are expressly prohibited:
+        <ul class="cv-list">
+          <li>Commercial manufacture, sale, or distribution of any bicycle, frame, or component derived from this content</li>
+          <li>Use by any company, organisation, or entity for commercial profit of any kind</li>
+          <li>Mass production of any component or assembly described herein</li>
+          <li>Distribution as a finished design to others for fabrication or commercial use</li>
+        </ul>
+      </div>
+
+      <hr class="cv-rule">
+      <div class="cv-head" data-cv="h4">&sect;&thinsp;4 &mdash; Risk of serious injury or death</div>
+      <div class="cv-warn">
+        <div class="cv-body" data-cv="b4"><i class="cv-warn-skull" aria-hidden="true">&#9760;</i><strong>A bicycle is a vehicle.</strong> At speed, a fork snap, weld fracture, dropout shear, or headtube failure gives the rider no warning and no time to react. Frame failures at speed have killed people. Any person who fabricates, assembles, modifies, or rides a bicycle informed by these documents <strong>accepts that risk entirely and in full.</strong> The creator of this tool accepts no liability — of any kind — for injury, death, property damage, or consequential loss arising, directly or indirectly, from its use.</div>
+      </div>
+
+      <hr class="cv-rule">
+      <div class="cv-head" data-cv="h5">&sect;&thinsp;5 &mdash; Agreement</div>
+      <div class="cv-body" data-cv="b5">By proceeding you confirm that:
+        <span class="cv-alpha">
+          (a)&ensp;You have read and understood all of the above;<br>
+          (b)&ensp;You accept complete and sole responsibility for any use you make of this tool and its outputs;<br>
+          (c)&ensp;You release the creator from any liability arising from that use;<br>
+          (d)&ensp;You will not use this tool or its outputs for any prohibited commercial purpose;<br>
+          (e)&ensp;You understand this is provided entirely as-is, with no warranty of any kind, express or implied.
+        </span>
+      </div>
+
+      <div style="height:24px"></div>
+    </div>
+
+    <div id="cover-foot">
+      <div id="cover-scroll-hint" data-cv="scroll_hint">&#8595;&ensp;scroll to read all terms</div>
+      <button id="cover-accept" disabled aria-disabled="true" data-cv-locked="btn_locked" data-cv-ready="btn_ready">
+        Scroll to read all terms before continuing
+      </button>
+      <div id="cover-legal" data-cv="legal">
+        BICYCLE TECHNICAL SCHEMATIC &middot; PERSONAL USE &amp; EDUCATION ONLY &middot; NOT FOR COMMERCIAL DISTRIBUTION<br>
+        Seek qualified professional engineering review before fabricating any load-bearing structure.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="cover-strings.js"></script>
+<script>
+(function(){
+  if(localStorage.getItem('bfs-terms-v1')==='1'){
+    document.getElementById('coversheet').style.display='none';
+    return;
+  }
+  var sb  = document.getElementById('cover-scroll-body');
+  var btn = document.getElementById('cover-accept');
+  var hint= document.getElementById('cover-scroll-hint');
+  window._cvUnlocked = false;
+
+  function checkScroll(){
+    if(window._cvUnlocked) return;
+    if(sb.scrollHeight - sb.scrollTop <= sb.clientHeight + 18){
+      window._cvUnlocked = true;
+      btn.disabled = false;
+      btn.setAttribute('aria-disabled','false');
+      btn.classList.add('ready');
+      var _cs = window.COVER_STRINGS;
+      var _lel = document.querySelector('.cv-lang-active[data-cvl]');
+      var _lc = _lel ? _lel.getAttribute('data-cvl') : 'en';
+      btn.textContent = (_cs && _cs[_lc] && _cs[_lc].btn_ready) || 'I understand and agree \u2014 enter the tool';
+      hint.classList.add('gone');
+    }
+  }
+  sb.addEventListener('scroll', checkScroll);
+  checkScroll();
+
+  btn.addEventListener('click', function(){
+    if(!btn.classList.contains('ready')) return;
+    localStorage.setItem('bfs-terms-v1','1');
+    var cs = document.getElementById('coversheet');
+    cs.style.transition='opacity .4s';
+    cs.style.opacity='0';
+    setTimeout(function(){ cs.style.display='none'; }, 420);
+  });
+
+  // expose for lang switcher scroll-reset
+  window._cvCheckScroll = checkScroll;
+})();
+</script>
+
+<div id="topbar">
+  <span class="tb-logo">BICYCLE TECHNICAL SCHEMATIC</span>
+  <span class="tb-sep">|</span>
+  <span class="tb-sub"><span id="tb-style">UTILITY / CITY</span> · DIAMOND FRAME · 26″</span>
+  <div class="tb-spacer"></div>
+  <div class="zoom-group">
+    <button class="zoom-btn" onclick="setZoom(.5)">50%</button>
+    <button class="zoom-btn" onclick="setZoom(.75)">75%</button>
+    <button class="zoom-btn" onclick="setZoom(1)">100%</button>
+    <button class="zoom-btn active" onclick="fitZoom()">FIT</button>
+  </div>
+  <span class="tb-sep">|</span>
+  <div class="lang-group">
+    <button class="lang-btn active" data-lang="en" onclick="setLang('en')" title="English">🇺🇸</button>
+    <button class="lang-btn" data-lang="fa" onclick="setLang('fa')" title="فارسی">🇮🇷</button>
+    <button class="lang-btn" data-lang="fr" onclick="setLang('fr')" title="Français">🇫🇷</button>
+    <button class="lang-btn" data-lang="es" onclick="setLang('es')" title="Español">🇪🇸</button>
+    <button class="lang-btn" data-lang="ru" onclick="setLang('ru')" title="Русский">🇷🇺</button>
+    <button class="lang-btn" data-lang="zh" onclick="setLang('zh')" title="中文">🇨🇳</button>
+  </div>
+  <span class="tb-sep">|</span>
+  <button class="tb-btn" onclick="resetCanvas()">RESET</button>
+  <select class="tb-select" id="preset-sel" onchange="loadPreset(this.value)">
+    <option value="utility">UTILITY / CITY</option>
+    <option value="road">ROAD / RACE</option>
+    <option value="touring">TOURING</option>
+    <option value="mountain">MOUNTAIN / ATB</option>
+    <option value="track">TRACK / FIXED</option>
+    <option value="dutch">DUTCH / COMFORT</option>
+  </select>
+  <button class="tb-btn primary" id="export-btn" onclick="exportSheet()">EXPORT SHEET 1</button>
+</div>
+<div id="sheetbar">
+  <button class="sheet-tab active" data-sheet="1" onclick="switchSheet(1)">SHEET 1 · GEOMETRY</button>
+  <button class="sheet-tab"        data-sheet="2" onclick="switchSheet(2)">SHEET 2 · BOM</button>
+  <button class="sheet-tab"        data-sheet="3" onclick="switchSheet(3)">SHEET 3 · FABRICATION</button>
+</div>
+
+<div id="workspace">
+  <div id="canvas-area">
+    <div id="canvas-scroll">
+      <div id="poster-wrap"><div id="poster-canvas"></div></div>
+    </div>
+  </div>
+
+  <div id="panel-right">
+    <div class="panel-hdr">SPECIFICATION</div>
+    <div id="right-scroll">
+      <div class="ssec" id="ss-geo">
+        <div class="ssec-hdr" onclick="toggleSec('ss-geo')">FRAME GEOMETRY <span>▾</span></div>
+        <div class="ssec-body">
+          <div class="geo-grid">
+            <div class="gfield"><label>HT ANGLE °</label><input id="g-hta" type="number" value="95.5" step="0.5"></div>
+            <div class="gfield"><label>ST ANGLE °</label><input id="g-sta" type="number" value="81" step="0.5"></div>
+            <div class="gfield"><label>CS LENGTH mm</label><input id="g-cs"  type="number" value="470" step="5"></div>
+            <div class="gfield"><label>BB DROP mm</label><input id="g-bbd" type="number" value="50"  step="5"></div>
+            <div class="gfield"><label>TT LENGTH mm</label><input id="g-tt"  type="number" value="555" step="5"></div>
+            <div class="gfield"><label>HT LENGTH mm</label><input id="g-ht"  type="number" value="140" step="5"></div>
+            <div class="gfield"><label>WHEELBASE mm</label><input id="g-wb"  type="number" value="1030" step="5"></div>
+            <div class="gfield"><label>FORK RAKE mm</label><input id="g-fr"  type="number" value="55"  step="5"></div>
+          </div>
+          <button class="gbtn" onclick="loadUtility()">← UTILITY DEFAULT</button>
+          <button class="gbtn apply" onclick="applyGeometry()">APPLY GEOMETRY →</button>
+        </div>
+      </div>
+      <div class="ssec" id="ss-iface">
+        <div class="ssec-hdr" onclick="toggleSec('ss-iface')">INTERFACE STANDARDS <span>▾</span></div>
+        <div class="ssec-body" id="iface-body"></div>
+      </div>
+      <div class="ssec" id="ss-valid">
+        <div class="ssec-hdr" onclick="toggleSec('ss-valid')">CONSTRAINT CHECK <span>▾</span></div>
+        <div class="ssec-body" id="valid-body"></div>
+      </div>
+      <div class="ssec" id="ss-title">
+        <div class="ssec-hdr" onclick="toggleSec('ss-title')">TITLE BLOCK <span>▾</span></div>
+        <div class="ssec-body">
+          <div class="srow"><span class="slabel">SHOP</span><input class="sval-input" id="tb-shop" placeholder="—"></div>
+          <div class="srow"><span class="slabel">BUILD</span><input class="sval-input" id="tb-build" placeholder="—"></div>
+          <div class="srow"><span class="slabel">BUILDER</span><input class="sval-input" id="tb-builder" placeholder="—"></div>
+          <div class="srow"><span class="slabel">DATE</span><input class="sval-input" id="tb-date" placeholder="—"></div>
+          <div class="srow"><span class="slabel">REV</span><input class="sval-input" id="tb-rev" value="A"></div>
+          <div class="srow"><span class="slabel">MATERIAL</span><input class="sval-input" id="tb-mat" placeholder="4130 CrMo / Hi-Ten"></div>
+          <div class="srow"><span class="slabel">FINISH</span><input class="sval-input" id="tb-finish" placeholder="—"></div>
+          <div class="srow"><span class="slabel">NOTES</span><input class="sval-input" id="tb-notes" placeholder="—"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ctx-menu"><div class="cxi danger" onclick="ctxDo('remove')">Remove component</div></div>
+<div id="toast"></div>
+<script src="schematic.js"></script>
+</body>
+</html>
