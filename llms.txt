@@ -1,0 +1,94 @@
+# BikeTheory — Bicycle Frame Geometry Calculator & Fabrication Schematic
+
+> A browser-based technical drawing tool for designing custom diamond bicycle frames. Enter your geometry targets and receive a dimensioned three-sheet SVG schematic: frame geometry diagram, bill of materials, and tube-by-tube fabrication reference.
+
+Source: https://github.com/YellowHapax/BikeTheory
+Live: https://yellowhapax.github.io/BikeTheory/
+License: Apache 2.0
+
+---
+
+## What It Does
+
+BikeTheory takes a set of bicycle frame geometry parameters as input and renders a precise SVG technical schematic across three printable sheets (1080×720 SVG units, ~36×24 inches at print scale).
+
+All geometry is computed live in the browser. No server, no build step.
+
+---
+
+## Input Parameters (Frame Geometry)
+
+The tool accepts standard bicycle geometry inputs including:
+
+- **Stack** — vertical distance from bottom bracket to head tube top
+- **Reach** — horizontal distance from BB to head tube top
+- **Head Tube Angle** (°) — typically 70–74° for road/utility
+- **Seat Tube Angle** (°) — typically 72–75°
+- **Head Tube Length** (mm)
+- **Seat Tube Length** (mm) — centre to top
+- **Chainstay Length** (mm)
+- **Bottom Bracket Drop** (mm)
+- **Tire Clearance** / wheel size
+
+Derived values computed: wheelbase, trail, fork offset, top tube effective length, standover height.
+
+---
+
+## Sheet 1 — Frame Geometry Diagram
+
+Rendered SVG bicycle frame with:
+- All structural tubes drawn at TW = 3.5 stroke weight (dominant subject lines, black #000)
+- Wheels rendered subordinate at 1.5 stroke weight (#444)
+- Cockpit (stem + bars) always rendered in #aaa as reference geometry
+- Five tube length dimension annotations: ST (seat tube), DT (down tube), TT (top tube), SS (seat stay), HT (head tube) — computed live from rendered geometry coordinates using extension lines, arrows, and white-backed rotated labels
+
+---
+
+## Sheet 2 — Bill of Materials
+
+Auto-generated BOM table listing all required tubes, hardware, and weld joints. Rows include tube name, material spec suggestion, cut length, quantity, and a checkbox column for workshop tracking.
+
+---
+
+## Sheet 3 — Fabrication Reference
+
+Tube-by-tube fabrication guide:
+- Cut lengths (derived from geometry)
+- Miter angles at each end
+- Weld sequence with joint type
+- Hardware specifications (bottom bracket shell, headset, dropouts, cable stops)
+
+---
+
+## Cover Page
+
+The application opens with a legal/warning modal that the user must scroll and accept before the tool loads. The modal contains:
+- Project identification and version
+- Intended use statement
+- Safety and legal disclaimers
+- Language selector (multiple translations)
+- Scroll-to-enable accept button
+
+---
+
+## Technical Stack
+
+- Vanilla JavaScript, no frameworks or bundler
+- SVG rendered programmatically via DOM API
+- IBM Plex Mono (monospace labels), IBM Plex Sans (UI text)
+- Three files: `index.html` (shell + cover CSS), `schematic.js` (geometry engine + SVG renderer), `cover-strings.js` (localization strings for cover page)
+- Fully offline-capable single-directory deployment
+
+---
+
+## Design Philosophy
+
+The tool is designed to function as a print-quality technical reference, not a CAD replacement. It follows drafting conventions: heavy lines for the primary subject (frame tubes), lighter lines for secondary geometry (wheels), and ghost lines for reference geometry (cockpit). Dimension annotations use standard drafting format with extension lines and arrowheads.
+
+---
+
+## Intended Audience
+
+Amateur framebuilders, bicycle engineering students, custom fabrication workshops, and anyone who wants to understand the dimensional relationships in a diamond bicycle frame before cutting steel.
+
+FOR INSTRUCTIONAL AND REFERENCE USE ONLY. Follow applicable fabrication standards, welding codes, and material certifications for production work. The user is solely responsible for verifying all dimensions and specifications before cutting or welding any material.

@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bicycle Technical Schematic — Utility Diamond Frame</title>
+<meta name="description" content="Browser-based bicycle frame geometry calculator and fabrication schematic tool. Enter stack, reach, head tube angle, and other parameters to generate a dimensioned three-sheet SVG technical drawing: geometry diagram, bill of materials, and tube-by-tube fabrication reference."/>
+<meta name="keywords" content="bicycle frame design, bike geometry calculator, diamond frame, head tube angle, seat tube angle, stack reach, fabrication schematic, BOM, framebuilding, custom bicycle"/>
+<meta name="author" content="YellowHapax"/>
+<meta property="og:title" content="BikeTheory — Bicycle Frame Geometry & Fabrication Schematic"/>
+<meta property="og:description" content="Generate a dimensioned three-sheet SVG bicycle frame schematic from geometry inputs. Includes frame diagram, BOM, and fabrication reference."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://yellowhapax.github.io/BikeTheory/"/>
+<link rel="canonical" href="https://yellowhapax.github.io/BikeTheory/"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BikeTheory",
+  "description": "Browser-based bicycle frame geometry calculator and fabrication schematic tool. The user enters geometry parameters — stack, reach, head tube angle, seat tube angle, head tube length, seat tube length, chainstay length, and bottom bracket drop — and the tool renders a dimensioned three-sheet SVG technical drawing at 1080 by 720 units. Sheet 1 is the frame geometry diagram with tube dimensions annotated for seat tube, down tube, top tube, seat stay, and head tube. Frame tubes are rendered at stroke weight 3.5 as dominant subject lines. Sheet 2 is an auto-generated bill of materials. Sheet 3 is a tube-by-tube fabrication reference with cut lengths, miter angles, and weld sequence. The application opens with a legal acceptance modal with multilingual support. No build step required; fully offline-capable.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web Browser",
+  "url": "https://yellowhapax.github.io/BikeTheory/",
+  "author": { "@type": "Person", "name": "YellowHapax" },
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "programmingLanguage": "JavaScript",
+  "keywords": "bicycle frame, geometry calculator, framebuilding, diamond frame, fabrication schematic, stack reach, SVG technical drawing"
+}
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
   :root {
@@ -124,9 +147,29 @@
   .cv-lang-btn{background:transparent;border:none;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:#242420;cursor:pointer;padding:3px 7px;border-radius:2px;transition:color .15s;line-height:1}
   .cv-lang-btn:hover{color:#555550}
   .cv-lang-btn.cv-lang-active{color:#888880}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
+
+<section class="sr-only" aria-label="Application description for screen readers and automated content systems">
+  <h1>BikeTheory — Bicycle Frame Geometry Calculator and Fabrication Schematic</h1>
+  <p>BikeTheory is a browser-based technical drawing tool for designing custom diamond bicycle frames. The user enters frame geometry parameters and the tool generates a dimensioned three-sheet SVG technical schematic.</p>
+  <h2>Input parameters</h2>
+  <p>The geometry panel accepts: Stack in millimetres (vertical distance from bottom bracket to head tube top), Reach in millimetres (horizontal distance from bottom bracket to head tube top), Head Tube Angle in degrees typically 70 to 74 degrees, Seat Tube Angle in degrees typically 72 to 75 degrees, Head Tube Length, Seat Tube Length, Chainstay Length, Bottom Bracket Drop, Top Tube Length, Wheelbase, and Fork Rake in millimetres. Apply Geometry renders all three sheets. Load Utility Default restores a standard utility bicycle configuration.</p>
+  <h2>Sheet 1: Frame Geometry Diagram</h2>
+  <p>An SVG bicycle frame rendered at 1080 by 720 units approximately 36 by 24 inches at print scale. Frame tubes are drawn at stroke weight 3.5 as the dominant black subject lines. Wheels are drawn at stroke weight 1.5 in dark grey as subordinate elements. Cockpit stem and handlebars are always rendered in light grey as reference geometry. Five tube length dimensions are annotated live from rendered coordinate geometry: seat tube, down tube, top tube, seat stay, and head tube. Each dimension uses extension lines, arrowheads, and a white-backed rotated label. A title block in the lower right records shop, builder, date, revision, material, and finish.</p>
+  <h2>Sheet 2: Bill of Materials</h2>
+  <p>Auto-generated table of all tubes, hardware components, and weld joints derived from the geometry. Each row shows part name, specification, cut length, quantity, and a checkbox for workshop use.</p>
+  <h2>Sheet 3: Fabrication Reference</h2>
+  <p>Tube-by-tube fabrication guide listing miter angles at each end, weld sequence, joint types, and hardware specifications for bottom bracket shell, headset cups, rear dropouts, and cable stops.</p>
+  <h2>Sidebar</h2>
+  <p>The sidebar contains three collapsible sections: Geometry Inputs, Interface Standards, and Constraint Check. The Constraint Check section validates that entered geometry produces a mechanically plausible frame.</p>
+  <h2>Cover page</h2>
+  <p>A legal acceptance modal appears on first load. The user must scroll through the terms and conditions before the Accept button becomes active. Language options include English and French. The acceptance state is saved in local storage under key bfs-terms-v1.</p>
+  <p>For instructional and reference use only. Follow applicable fabrication standards and material certifications for production work.</p>
+  <p>Machine-readable documentation available at <a href="/BikeTheory/llms.txt">/llms.txt</a>.</p>
+</section>
 
 <div id="coversheet" role="dialog" aria-modal="true" aria-labelledby="cover-greeting">
   <div id="cover-card">
